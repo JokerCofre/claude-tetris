@@ -39,8 +39,76 @@ const overlay = document.getElementById('overlay');
 const overlayTitle = document.getElementById('overlay-title');
 const overlayScore = document.getElementById('overlay-score');
 const restartBtn = document.getElementById('restart-btn');
+const bombBtn = document.getElementById('bomb-btn');
 
 let board, current, next, score, lines, level, paused, gameOver, lastTime, dropAccum, dropInterval, animId;
+
+// Partículas de explosión
+let particles = [];
+
+function createExplosion() {
+  particles = [];
+  for (let r = 0; r < ROWS; r++) {
+    for (let c = 0; c < COLS; c++) {
+      if (board[r][c]) {
+        const colorIdx = board[r][c];
+        const cx = c * BLOCK + BLOCK / 2;
+        const cy = r * BLOCK + BLOCK / 2;
+        for (let i = 0; i < 4; i++) {
+          const angle = Math.random() * Math.PI * 2;
+          const speed = 2 + Math.random() * 5;
+          particles.push({
+            x: cx, y: cy,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed,
+            size: 4 + Math.random() * 6,
+            color: COLORS[colorIdx],
+            alpha: 1,
+            decay: 0.02 + Math.random() * 0.03,
+          });
+        }
+      }
+    }
+  }
+}
+
+function updateParticles() {
+  for (const p of particles) {
+    p.x += p.vx;
+    p.y += p.vy;
+    p.vy += 0.2; // gravedad
+    p.alpha -= p.decay;
+  }
+  particles = particles.filter(p => p.alpha > 0);
+}
+
+function drawParticles() {
+  for (const p of particles) {
+    ctx.save();
+    ctx.globalAlpha = p.alpha;
+    ctx.fillStyle = p.color;
+    ctx.shadowColor = p.color;
+    ctx.shadowBlur = 8;
+    ctx.fillRect(p.x - p.size / 2, p.y - p.size / 2, p.size, p.size);
+    ctx.restore();
+  }
+}
+
+function triggerBomb() {
+  if (paused || gameOver) return;
+  const hasBlocks = board.some(row => row.some(v => v !== 0));
+  if (!hasBlocks) return;
+
+  createExplosion();
+  board = createBoard();
+  updateHUD();
+
+  canvas.classList.add('exploding');
+  setTimeout(() => canvas.classList.remove('exploding'), 500);
+
+  bombBtn.disabled = true;
+  setTimeout(() => { bombBtn.disabled = false; }, 3000);
+}
 
 function createBoard() {
   return Array.from({ length: ROWS }, () => new Array(COLS).fill(0));
@@ -205,6 +273,12 @@ function draw() {
   for (let r = 0; r < current.shape.length; r++)
     for (let c = 0; c < current.shape[r].length; c++)
       drawBlock(ctx, current.x + c, current.y + r, current.shape[r][c], BLOCK);
+
+  // partículas de explosión
+  if (particles.length > 0) {
+    updateParticles();
+    drawParticles();
+  }
 }
 
 function drawNext() {
@@ -265,17 +339,20 @@ function init() {
   gameOver = false;
   dropInterval = 1000;
   dropAccum = 0;
+  particles = [];
   lastTime = performance.now();
   next = randomPiece();
   spawn();
   updateHUD();
   overlay.classList.add('hidden');
+  bombBtn.disabled = false;
   cancelAnimationFrame(animId);
   animId = requestAnimationFrame(loop);
 }
 
 document.addEventListener('keydown', e => {
   if (e.code === 'KeyP') { togglePause(); return; }
+  if (e.code === 'KeyB') { triggerBomb(); return; }
   if (paused || gameOver) return;
   switch (e.code) {
     case 'ArrowLeft':
@@ -300,5 +377,6 @@ document.addEventListener('keydown', e => {
 });
 
 restartBtn.addEventListener('click', init);
+bombBtn.addEventListener('click', triggerBomb);
 
 init();
