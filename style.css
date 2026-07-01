@@ -21,17 +21,17 @@ body {
 
 .game-title {
   text-align: center;
-  font-size: 32px;
+  font-size: 26px;
   font-weight: 800;
-  letter-spacing: 8px;
+  letter-spacing: 6px;
   color: #7aa2f7;
-  margin-bottom: 16px;
+  margin-bottom: 10px;
   text-shadow: 0 0 20px rgba(122, 162, 247, 0.5);
 }
 
 .game-container {
   display: flex;
-  gap: 20px;
+  gap: 16px;
   align-items: flex-start;
 }
 
@@ -45,17 +45,17 @@ body {
 
 /* ---- Panel lateral ---- */
 .panel {
-  width: 160px;
+  width: 150px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 14px;
   padding-top: 4px;
 }
 
 .panel-section {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
 }
 
 .label {
@@ -67,7 +67,7 @@ body {
 
 .value {
   font-family: 'Courier New', Courier, monospace;
-  font-size: 26px;
+  font-size: 22px;
   font-weight: 700;
   color: #7aa2f7;
   letter-spacing: 1px;
@@ -85,15 +85,15 @@ body {
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
 }
 
 .controls li {
-  font-size: 12px;
+  font-size: 11px;
   color: #888;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 3px;
 }
 
 kbd {
@@ -112,12 +112,13 @@ kbd {
   color: #fff;
   border: none;
   border-radius: 8px;
-  padding: 10px 16px;
-  font-size: 15px;
+  padding: 8px 10px;
+  font-size: 13px;
   font-weight: 700;
   cursor: pointer;
-  letter-spacing: 1px;
+  letter-spacing: 0.5px;
   width: 100%;
+  white-space: nowrap;
   transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
   box-shadow: 0 3px 10px rgba(229, 115, 115, 0.4);
 }

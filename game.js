@@ -2,7 +2,7 @@
 
 const COLS = 10;
 const ROWS = 20;
-const BLOCK = 30;
+const BLOCK = 28;
 
 const COLORS = [
   null,
@@ -282,7 +282,7 @@ function draw() {
 }
 
 function drawNext() {
-  const NB = 30;
+  const NB = Math.floor(nextCanvas.width / 4);
   nextCtx.clearRect(0, 0, nextCanvas.width, nextCanvas.height);
   const shape = next.shape;
   const offX = Math.floor((4 - shape[0].length) / 2);
