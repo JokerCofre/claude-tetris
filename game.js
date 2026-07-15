@@ -40,6 +40,7 @@ const overlayTitle = document.getElementById('overlay-title');
 const overlayScore = document.getElementById('overlay-score');
 const restartBtn = document.getElementById('restart-btn');
 const bombBtn = document.getElementById('bomb-btn');
+const themeToggle = document.getElementById('theme-toggle');
 
 let board, current, next, score, lines, level, paused, gameOver, lastTime, dropAccum, dropInterval, animId;
 
@@ -330,6 +331,24 @@ function loop(ts) {
   animId = requestAnimationFrame(loop);
 }
 
+const THEME_STORAGE_KEY = 'tetris-theme';
+
+function applyTheme(theme) {
+  document.body.classList.toggle('light-theme', theme === 'light');
+  themeToggle.checked = theme === 'light';
+}
+
+function initTheme() {
+  const savedTheme = localStorage.getItem(THEME_STORAGE_KEY);
+  applyTheme(savedTheme === 'light' ? 'light' : 'dark');
+}
+
+themeToggle.addEventListener('change', () => {
+  const theme = themeToggle.checked ? 'light' : 'dark';
+  applyTheme(theme);
+  localStorage.setItem(THEME_STORAGE_KEY, theme);
+});
+
 function init() {
   board = createBoard();
   score = 0;
@@ -379,4 +398,5 @@ document.addEventListener('keydown', e => {
 restartBtn.addEventListener('click', init);
 bombBtn.addEventListener('click', triggerBomb);
 
+initTheme();
 init();
