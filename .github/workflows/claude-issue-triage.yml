@@ -1,0 +1,80 @@
+name: Claude Issue Triage
+
+on:
+  issues:
+    types: [opened, edited]
+
+jobs:
+  triage:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Run Claude Issue Triage
+        id: claude-triage
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+
+          claude_args: |
+            --allowed-tools "Bash(gh issue edit:*),Bash(gh issue view:*),Bash(gh label list:*),Bash(gh issue comment:*)"
+
+          prompt: |
+            Eres un asistente de triage de issues para el repositorio "${{ github.repository }}",
+            un juego de Tetris en JavaScript vanilla (archivos principales: game.js, index.html, style.css).
+
+            Analiza el issue #${{ github.event.issue.number }} de este repositorio:
+
+            Título: ${{ github.event.issue.title }}
+
+            Cuerpo:
+            ${{ github.event.issue.body }}
+
+            Realiza las siguientes acciones EN ORDEN:
+
+            1. Determina qué labels existentes son apropiadas para este issue, eligiendo
+               únicamente entre las labels ya disponibles en el repo:
+               bug, documentation, duplicate, enhancement, good first issue, help wanted,
+               invalid, question, wontfix.
+               No crees labels nuevas. Aplica las labels elegidas con:
+               gh issue edit ${{ github.event.issue.number }} --add-label "label1" --add-label "label2"
+
+            2. Publica un comentario de diagnóstico en el issue usando
+               `gh issue comment ${{ github.event.issue.number }} --body-file -` (pasando el
+               contenido por stdin) con el siguiente formato Markdown EXACTO, reemplazando
+               el contenido entre corchetes por tu análisis real:
+
+               ## 🔍 Diagnóstico automático
+
+               **Resumen del problema:**
+               [resumen breve y claro de lo que reporta o pide el issue]
+
+               **Labels asignadas:** `label1`, `label2`
+
+               **Área probable del código:** [ej. game.js — lógica de colisiones/rotación de piezas, index.html — estructura, style.css — estilos]
+
+               **Severidad estimada:** Baja / Media / Alta
+
+               **Diagnóstico técnico:**
+               [explica la causa probable del problema o el alcance del feature solicitado,
+               basándote en la estructura del repo]
+
+               **Pasos sugeridos para la solución:**
+               - [paso 1]
+               - [paso 2]
+               - [paso 3 si aplica]
+
+               ---
+               *Comentario generado automáticamente por Claude para facilitar el triage. No reemplaza el análisis humano.*
+
+            Si el issue no tiene suficiente información para diagnosticar el problema,
+            indícalo explícitamente en el diagnóstico y sugiere qué información adicional
+            se necesita, en lugar de inventar detalles.
