@@ -25,7 +25,7 @@ jobs:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
 
           claude_args: |
-            --allowed-tools "Bash(gh issue edit:*),Bash(gh issue view:*),Bash(gh label list:*),Bash(gh issue comment:*)"
+            --allowedTools "Bash(gh issue edit:*),Bash(gh issue view:*),Bash(gh label list:*),Bash(gh issue comment:*)"
 
           prompt: |
             Eres un asistente de triage de issues para el repositorio "${{ github.repository }}",
